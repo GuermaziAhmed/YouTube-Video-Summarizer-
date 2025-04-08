@@ -2,7 +2,8 @@
 
 A Streamlit app that extracts a YouTube video's transcript and generates a customizable summary using **Gemini Pro** (Google Generative AI). You can choose the summary length, style, and language. You can also ask questions about the content and even listen to the summary via text-to-speech.
 
-![screenshot](https://placehold.co/800x400?text=YouTube+Summarizer+Screenshot)
+![image](https://github.com/user-attachments/assets/5d8ebf1b-cfaa-4e36-b8d7-f6e0f726077a)
+
 
 ---
 
