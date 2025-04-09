@@ -23,7 +23,7 @@ A Streamlit app that extracts a YouTube video's transcript and generates a custo
 
 1. **Clone the repository**
 ```bash
-git clone [https://github.com/yourusername/youtube-summarizer.git](https://github.com/GuermaziAhmed/YouTube-Video-Summarizer-.git)
+git clone https://github.com/GuermaziAhmed/YouTube-Video-Summarizer-.git
 cd youtube-summarizer
 ```
 
