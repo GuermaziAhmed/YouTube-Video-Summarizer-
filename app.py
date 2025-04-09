@@ -4,24 +4,26 @@ import google.generativeai as genai
 from gtts import gTTS
 import os
 from io import BytesIO
+import whisper
+from pytube import YouTube
 
-# ------------- Transcript Extraction -------------
+# ------------- Transcript Extraction using Whisper -------------
 def get_video_transcript(video_url):
     try:
-        video_id = video_url.split('v=')[1]
+        # Extract audio from YouTube video
+        video_id = video_url.split("v=")[1].split("&")[0]
+        audio_file = f"{video_id}.mp3"
+        
+        yt = YouTube(video_url)
+        yt.streams.filter(only_audio=True).first().download(filename=audio_file)
 
-        # Proxy configuration
-        proxy = "http://41.32.39.118:3128"
-        proxies = {
-            "http": proxy,
-            "https": proxy,
-        }
-
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
-        transcript = ' '.join([entry['text'] for entry in transcript_list])
+        # Transcribe using Whisper
+        model = whisper.load_model("base")
+        result = model.transcribe(audio_file)
+        transcript = result['text']
         return transcript
     except Exception as e:
-        st.error(f"Error extracting transcript: {str(e)}")
+        st.error(f"❌ Error extracting transcript: {str(e)}")
         return None
 
 # ------------- Summarization via Gemini -------------
