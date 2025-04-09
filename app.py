@@ -4,24 +4,50 @@ import google.generativeai as genai
 from gtts import gTTS
 import os
 from io import BytesIO
-import whisper
-from pytube import YouTube
+import requests
 
-# ------------- Transcript Extraction using Whisper -------------
+# ------------- Transcript Extraction using YouTube Transcript API -------------
 def get_video_transcript(video_url):
     try:
-        # Extract audio from YouTube video
+        # Extract video ID
         video_id = video_url.split("v=")[1].split("&")[0]
-        audio_file = f"{video_id}.mp3"
         
-        yt = YouTube(video_url)
-        yt.streams.filter(only_audio=True).first().download(filename=audio_file)
-
-        # Transcribe using Whisper
-        model = whisper.load_model("base")
-        result = model.transcribe(audio_file)
-        transcript = result['text']
-        return transcript
+        # First attempt: Try direct YouTube Transcript API
+        try:
+            transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+            transcript = " ".join([entry["text"] for entry in transcript_list])
+            return transcript
+        except Exception as direct_error:
+            st.warning("⚠️ Direct transcript extraction failed, trying alternative method...")
+            
+            # Second attempt: Use a free public API that provides transcript service
+            try:
+                # Using a public API service that returns transcripts
+                api_url = f"https://youtubetranscript.com/?server_vid={video_id}"
+                response = requests.get(api_url)
+                
+                if response.status_code == 200:
+                    # Parse the response to extract the transcript text
+                    data = response.json()
+                    if "text" in data:
+                        return data["text"]
+                    else:
+                        st.error("❌ No transcript data found in the response.")
+                        return None
+                else:
+                    st.error(f"❌ API request failed with status code: {response.status_code}")
+                    return None
+            except Exception as api_error:
+                st.error(f"❌ Alternative method failed: {str(api_error)}")
+                
+                # Third attempt: Manual input
+                st.error("❌ All automated transcript methods failed.")
+                st.info("💡 You can manually paste the transcript below:")
+                
+                manual_transcript = st.text_area("Manual Transcript Input", height=200)
+                if manual_transcript and len(manual_transcript) > 50:  # Ensure it's not empty or too short
+                    return manual_transcript
+                return None
     except Exception as e:
         st.error(f"❌ Error extracting transcript: {str(e)}")
         return None
