@@ -46,7 +46,7 @@ def download_audio(url, output_path="audio.wav", progress_callback=None):
 def transcribe_audio(audio_path):
     logging.info("Transcribing audio...")
     try:
-        model = whisper.load_model("tiny")
+        model = whisper.load_model("tiny", device="cpu")
         result = model.transcribe(audio_path)
         logging.info("Transcription complete!")
         return result["text"]
