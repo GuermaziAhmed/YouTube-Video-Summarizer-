@@ -1,22 +1,60 @@
 import streamlit as st
-from youtube_transcript_api import YouTubeTranscriptApi
 import google.generativeai as genai
 from gtts import gTTS
 import os
 from io import BytesIO
+import whisper
+import yt_dlp
+import logging
 
-# ------------- Transcript Extraction using YouTube Transcript API -------------
-def get_video_transcript(video_url):
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# ------------- Téléchargement Audio -------------
+def download_audio(url, output_path="audio.wav", progress_callback=None):
+    def progress_hook(d):
+        if d['status'] == 'downloading':
+            total_bytes = d.get('total_bytes', 0) or d.get('total_bytes_estimate', 0)
+            downloaded_bytes = d.get('downloaded_bytes', 0)
+            if total_bytes > 0 and progress_callback:
+                percent = int((downloaded_bytes / total_bytes) * 100)
+                progress_callback(percent, f"Download Progress: {percent}%")
+        elif d['status'] == 'finished' and progress_callback:
+            progress_callback(100, "Download Progress: 100%")
+
+    ydl_opts = {
+        'format': 'bestaudio[ext=m4a]/bestaudio/best',
+        'outtmpl': output_path,
+        'progress_hooks': [progress_hook],
+        'quiet': True,
+    }
+
     try:
-        video_id = video_url.split("v=")[1].split("&")[0]
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-        transcript = " ".join([entry["text"] for entry in transcript_list])
-        return transcript
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        if os.path.exists(output_path):
+            logging.info(f"Audio downloaded successfully: {output_path}")
+            return output_path
+        else:
+            logging.error("Failed to download audio.")
+            return None
     except Exception as e:
-        st.error(f"❌ Error extracting transcript: {str(e)}")
+        logging.error(f"Error downloading audio: {e}")
         return None
 
-# ------------- Summarization via Gemini -------------
+# ------------- Transcription -------------
+def transcribe_audio(audio_path):
+    logging.info("Transcribing audio...")
+    try:
+        model = whisper.load_model("tiny")
+        result = model.transcribe(audio_path)
+        logging.info("Transcription complete!")
+        return result["text"]
+    except Exception as e:
+        logging.error(f"Error during transcription: {str(e)}")
+        return None
+
+# ------------- Résumé -------------
 def summarize_transcript_gemini(transcript, length, style, language):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -47,15 +85,12 @@ def summarize_transcript_gemini(transcript, length, style, language):
 
     try:
         response = model.generate_content(prompt)
-        if not response.candidates:
-            st.error("⚠️ No response candidates returned by Gemini.")
-            return None
-        return response.text.strip()
+        return response.text.strip() if response.candidates else None
     except Exception as e:
         st.error(f"❌ Error summarizing: {str(e)}")
         return None
 
-# ------------- Ask a Question -------------
+# ------------- Questions -------------
 def ask_question_about_video(transcript, question, language):
     api_key = os.getenv("GEMINI_API_KEY")
     genai.configure(api_key=api_key)
@@ -85,13 +120,27 @@ def generate_tts(summary, language_code):
         st.error(f"❌ Error with text-to-speech: {str(e)}")
         return None
 
-# ------------- Main App -------------
+# ------------- Traitement Principal -------------
+def process_video(url):
+    audio_path = "audio.wav"
+    audio_path = download_audio(url, audio_path)
+    if not audio_path:
+        return None
+
+    transcript = transcribe_audio(audio_path)
+
+    # Clean up
+    if os.path.exists(audio_path):
+        os.remove(audio_path)
+
+    return transcript
+
+# ------------- Main App Streamlit -------------
 def main():
     st.set_page_config(page_title="🎬 YouTube Summarizer+", layout="centered")
     st.title("📽️ YouTube Video Summarizer+")
     st.markdown("💡 Summarize, ask questions, download or listen to any YouTube video content.")
 
-    # --- Session state initialization ---
     if "transcript" not in st.session_state:
         st.session_state["transcript"] = None
     if "summary" not in st.session_state:
@@ -114,32 +163,25 @@ def main():
 
     if st.button("🚀 Summarize"):
         if video_url:
-            transcript = get_video_transcript(video_url)
+            transcript = process_video(video_url)
             if transcript:
                 st.session_state["transcript"] = transcript
-
                 with st.expander("📜 Full Transcript"):
                     st.write(transcript)
 
                 summary = summarize_transcript_gemini(transcript, length, style, language)
                 if summary:
                     st.session_state["summary"] = summary
-                else:
-                    st.session_state["summary"] = None
             else:
                 st.warning("⚠️ Failed to extract transcript.")
         else:
             st.warning("👉 Please enter a YouTube URL.")
 
-    # --- Display Summary if exists ---
     if st.session_state.get("summary"):
         st.success("✅ Summary:")
         st.write(st.session_state["summary"])
-
-        # Download as .txt
         st.download_button("📥 Download Summary (.txt)", st.session_state["summary"], file_name="summary.txt")
 
-        # Text-to-Speech
         mp3 = generate_tts(st.session_state["summary"], language_code_map[language])
         if mp3:
             st.audio(mp3, format="audio/mp3")
