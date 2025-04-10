@@ -1,5 +1,6 @@
-streamlit
-google-generativeai
-youtube-transcript-api
-gTTS
-python-dotenv
+streamlit==1.32.0
+google-generativeai==0.3.2
+gTTS==2.4.0
+openai-whisper==20240930
+yt-dlp==2025.1.15
+python-dotenv==1.0.1
