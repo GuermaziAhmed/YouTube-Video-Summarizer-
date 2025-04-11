@@ -39,10 +39,12 @@ def download_audio(url, output_path="audio.wav", progress_callback=None):
         logging.error(f"Error downloading audio: {e}")
         return None
 def transcribe_audio(audio_path):
+    logging.info("Transcribing audio...")
     try:
-        model = whisper.load_model("tiny")
+        model = whisper.load_model("tiny", device="cpu")
         result = model.transcribe(audio_path)
+        logging.info("Transcription complete!")
         return result["text"]
     except Exception as e:
-        logging.error(f"Transcription error: {e}")
+        logging.error(f"Error during transcription: {str(e)}")
         return None

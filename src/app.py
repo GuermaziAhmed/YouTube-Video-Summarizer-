@@ -15,10 +15,11 @@ def process_video(url):
         return None
 
     transcript = transcribe_audio(audio_path)
-    
+
+    # Clean up
     if os.path.exists(audio_path):
         os.remove(audio_path)
-    
+
     return transcript
 
 def main():
