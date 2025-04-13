@@ -6,7 +6,7 @@
 
 An AI-powered YouTube video processing system that provides intelligent summarization, Q&A capabilities, and audio conversion features.
 
-![App Interface](https://via.placeholder.com/800x450.png?text=YouTube+Summarizer+Interface)
+![App Interface](image.png)
 
 ## 🌟 Key Features
 
