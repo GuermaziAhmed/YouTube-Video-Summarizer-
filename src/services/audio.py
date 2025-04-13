@@ -22,6 +22,16 @@ def download_audio(url, output_path="audio.wav", progress_callback=None):
         
         'preferredquality': '160',  # Lower bitrate = smaller file
     }],
+         'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept-Language': 'en-US,en;q=0.5'
+        },
+        'retries': 10,
+        'fragment_retries': 10,
+        'skip_unavailable_fragments': True,
+        'ignoreerrors': True,
+        'nocheckcertificate': True,
+        'verbose': True,
         'progress_hooks': [progress_hook],
         'quiet': True,
     }
