@@ -3,7 +3,7 @@ import whisper
 import os
 import logging
 
-def download_audio(url, output_path="audio.wav", progress_callback=None):
+def download_audio(url, output_path="audio.m4a", progress_callback=None):
     def progress_hook(d):
         if d['status'] == 'downloading':
             total_bytes = d.get('total_bytes', 0) or d.get('total_bytes_estimate', 0)
@@ -17,23 +17,9 @@ def download_audio(url, output_path="audio.wav", progress_callback=None):
     ydl_opts = {
         'format': 'bestaudio[ext=m4a]/bestaudio/best',
         'outtmpl': output_path,
-        'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        
-        'preferredquality': '160',  # Lower bitrate = smaller file
-    }],
-         'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept-Language': 'en-US,en;q=0.5'
-        },
-        'retries': 10,
-        'fragment_retries': 10,
-        'skip_unavailable_fragments': True,
-        'ignoreerrors': True,
-        'nocheckcertificate': True,
-        'verbose': True,
         'progress_hooks': [progress_hook],
         'quiet': True,
+        'noplaylist': True,
     }
 
     try:
@@ -48,6 +34,8 @@ def download_audio(url, output_path="audio.wav", progress_callback=None):
     except Exception as e:
         logging.error(f"Error downloading audio: {e}")
         return None
+
+# ------------- Transcription -------------
 def transcribe_audio(audio_path):
     logging.info("Transcribing audio...")
     try:
