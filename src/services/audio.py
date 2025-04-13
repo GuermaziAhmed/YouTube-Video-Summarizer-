@@ -18,6 +18,7 @@ def download_audio(url, output_path="audio.m4a", progress_callback=None):
         'format': 'bestaudio[ext=m4a]/bestaudio/best',
         'outtmpl': output_path,
         'progress_hooks': [progress_hook],
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',  # This tricks YouTube
         'quiet': True,
         'noplaylist': True,
     }
