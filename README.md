@@ -1,117 +1,99 @@
-# 🎬 YouTube Video Summarizer+
+# 🎬 YouTube Video Summarizer 
 
-A Streamlit app that extracts a YouTube video's transcript and generates a customizable summary using **Gemini Pro** (Google Generative AI). You can choose the summary length, style, and language. You can also ask questions about the content and even listen to the summary via text-to-speech.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://youtube-video-summarizer-ahmed-guermazi.streamlit.app//)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-![image](https://github.com/user-attachments/assets/5d8ebf1b-cfaa-4e36-b8d7-f6e0f726077a)
+An AI-powered YouTube video processing system that provides intelligent summarization, Q&A capabilities, and audio conversion features.
 
+![App Interface](https://via.placeholder.com/800x450.png?text=YouTube+Summarizer+Interface)
 
----
+## 🌟 Key Features
 
-## 🚀 Features
+| Feature                      | Technology Stack              |
+|------------------------------|-------------------------------|
+| YouTube Audio Extraction      | yt-dlp, FFmpeg                |
+| AI-Powered Transcription      | OpenAI Whisper                |
+| Smart Summarization           | Google Gemini Pro             |
+| Multilingual Support          | 5 Languages                   |
+| Text-to-Speech Conversion     | gTTS                          |
+| Containerization Support      | Docker                        |
 
-- 🔍 **Extract YouTube Transcripts**
-- 📝 **Summarize using Gemini AI**
-- 🎯 **Choose Summary Style & Length**
-- 🌍 **Multilingual Summaries** (English, Français, Español, Deutsch, Arabic)
-- 🧠 **Ask Questions** about the video content
-- 🔊 **Listen** to summaries with Text-to-Speech
-- 📥 **Download** summaries as `.txt` files
+## 🛠️ Installation
 
----
-
-## 📦 Installation
-
-1. **Clone the repository**
+### Method 1: Local Development
 ```bash
 git clone https://github.com/GuermaziAhmed/YouTube-Video-Summarizer-.git
-cd youtube-summarizer
-```
+cd YouTube-Video-Summarizer-
 
-2. **Create a virtual environment (optional but recommended)**
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-```bash
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-4. **Set your Gemini API Key**
-
-Make sure to get an API key from [Google AI Studio](https://makersuite.google.com/app)  
-Then create a `.env` file or set an environment variable:
-
+### Method 2: Docker Container
 ```bash
-export GEMINI_API_KEY=your_api_key_here  # On Windows: set GEMINI_API_KEY=your_api_key_here
+# Build the Docker image
+docker build -t yt-summarizer .
+
+# Run the container
+docker run -p 8501:8501 yt-summarizer
 ```
 
----
+## ⚙️ Configuration
+1. Obtain [Google Gemini API Key](https://ai.google.dev/)
+2. Create `.env` file:
+```ini
+GEMINI_API_KEY=your_google_ai_key_here
+```
 
-## ▶️ Run the App
+## 📂 Project Structure
+```
+YouTube-Video-Summarizer-/
+├── Dockerfile
+├── requirements.txt
+├── packages.txt
+├── src/
+│   ├── app.py            # Streamlit interface
+│   ├── services/
+│   │   ├── audio.py      # Audio processing
+│   │   ├── ai.py         # AI integrations
+│   │   └── __init__.py       
+│   └── utils/
+│       ├── __init__.py   
+└──       └── helpers.py    # Utility functions
+ 
+```
 
+## 🚀 Launching the Application
 ```bash
-streamlit run app.py
+# For local development
+streamlit run src/app.py
+
+# For Docker deployment
+docker run -p 8501:8501 -e GEMINI_API_KEY=your_key yt-summarizer
 ```
 
-The app will open in your browser at `http://localhost:8501`
+## 🌐 Live Demo
+Experience the production version:  
+[https://youtube-video-summarizer-ahmed-guermazi.streamlit.app/](https://youtube-video-summarizer-ahmed-guermazi.streamlit.app//)
 
----
 
-## 📄 Requirements
+## 🤝 Contributing
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/new-feature`)
+3. Commit changes (`git commit -m 'Add new feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Open Pull Request
 
-- Python 3.8+
-- Streamlit
-- google-generativeai
-- youtube-transcript-api
-- gTTS
-
-You can install everything via:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 📁 File Structure
-
-```
-📦youtube-summarizer
- ┣ 📜app.py                # Main Streamlit application
- ┣ 📜requirements.txt      # Python dependencies
- ┗ 📄README.md             # You're here!
-```
-
----
-
-## 🛠 To-Do / Ideas
-
-- [ ] Export summaries as PDF
-- [ ] Detect and use video title
-- [ ] Add dark mode toggle
-- [ ] Optional translation feature
-- [ ] Deploy on Streamlit Cloud / Hugging Face Spaces
-
----
-
-## 💡 Credits
-
-Built using:
-- [Streamlit](https://streamlit.io/)
-- [Gemini Pro by Google](https://ai.google.dev/)
-- [YouTube Transcript API](https://pypi.org/project/youtube-transcript-api/)
-- [gTTS - Google Text-to-Speech](https://pypi.org/project/gTTS/)
-
----
+## 📜 License
+Distributed under MIT License. See `LICENSE` for details.
 
 ## 📬 Contact
-
-Have suggestions or issues?  
- email me at `ahmed.guermazi@supcom.tn`
-
----
-
+**Ahmed Guermazi**  
+Email: [ahmed.guermazi@supcom.tn](mailto:ahmed.guermazi@supcom.tn)  
+GitHub: [@GuermaziAhmed](https://github.com/GuermaziAhmed)
+```
